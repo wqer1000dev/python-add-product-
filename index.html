@@ -4,535 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ürünler</title>
-  <style>
-    :root {
-      --bg: #121214;
-      --panel: #1c1d20;
-      --row: #232428;
-      --line: #2e2f34;
-      --text: #ededef;
-      --muted: #8b8d94;
-      --accent: #4f8cff;
-      --accent-hover: #3b78ee;
-      --admin: #a855f7;
-      --user: #22c55e;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-      line-height: 1.5;
-      min-height: 100vh;
-      padding: 24px 16px 56px;
-    }
-
-    /* Profil (sol üst) */
-    .profile {
-      max-width: 1120px;
-      margin: 0 auto 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .profile .avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: #0b0b0d;
-      border: 1px solid var(--line);
-      display: grid; place-items: center;
-      overflow: hidden;
-    }
-    .profile .avatar img { width: 34px; height: 34px; display: block; }
-    .profile .username { font-weight: 600; line-height: 1.2; }
-
-    .layout {
-      max-width: 1120px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 20px;
-      align-items: start;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .title {
-      font-size: .78rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-
-    /* Ürün satırı */
-    .product {
-      background: var(--row);
-      border: 1px solid transparent;
-      border-radius: 10px;
-      transition: border-color .2s;
-    }
-    .product + .product { margin-top: 10px; }
-    .product.open { border-color: var(--line); }
-
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
-    }
-    .logo {
-      width: 40px; height: 40px;
-      border-radius: 9px;
-      background: #2e2f34;
-      display: grid; place-items: center;
-      flex-shrink: 0;
-    }
-    .logo img { width: 26px; height: 26px; display: block; }
-    .logo img.wide { width: 37px; height: auto; }
-    .name { flex: 1; font-weight: 600; }
-    .version {
-      font-family: ui-monospace, Consolas, monospace;
-      font-size: .82rem;
-      color: var(--muted);
-    }
-
-    .btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 20px;
-      font: inherit;
-      font-weight: 600;
-      font-size: .9rem;
-      cursor: pointer;
-      transition: background .2s, transform .1s;
-    }
-    .btn:hover { background: var(--accent-hover); }
-    .btn:active { transform: scale(.97); }
-    .btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-    .product.open .row .btn {
-      background: transparent;
-      color: var(--muted);
-      box-shadow: inset 0 0 0 1px var(--line);
-    }
-
-    /* Açılır detay */
-    .details {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows .3s ease;
-    }
-    .product.open .details { grid-template-rows: 1fr; }
-    .details-inner { overflow: hidden; }
-    .details-content {
-      padding: 4px 16px 18px;
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      grid-template-areas:
-        "video prices"
-        "desc  desc";
-      gap: 16px;
-    }
-
-    .video {
-      grid-area: video;
-      aspect-ratio: 16 / 9;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #000;
-    }
-    .video iframe { width: 100%; height: 100%; border: 0; display: block; }
-    .video .empty {
-      width: 100%; height: 100%;
-      display: grid; place-items: center;
-      color: var(--muted); font-size: .85rem;
-    }
-
-    .prices {
-      grid-area: prices;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .plan {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text);
-      font: inherit;
-      cursor: pointer;
-      text-align: left;
-      transition: border-color .2s, background .2s;
-    }
-    .plan:hover { border-color: var(--accent); background: rgba(79, 140, 255, .06); }
-    .plan.popular { border-color: var(--accent); background: rgba(79, 140, 255, .08); }
-    .plan .label { font-size: .9rem; }
-    .plan .tag {
-      display: block;
-      font-size: .7rem;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-    .plan .price { font-weight: 700; white-space: nowrap; }
-    .plan .old {
-      display: block;
-      font-size: .75rem;
-      font-weight: 400;
-      color: var(--muted);
-      text-decoration: line-through;
-      text-align: right;
-    }
-    .note { font-size: .75rem; color: var(--muted); text-align: center; margin-top: 2px; }
-
-    .desc {
-      grid-area: desc;
-      font-size: .9rem;
-      color: #c4c5cb;
-      border-top: 1px solid var(--line);
-      padding-top: 14px;
-    }
-    .desc ul { list-style: none; margin-top: 8px; display: grid; gap: 4px; }
-    .desc li::before { content: "✓ "; color: var(--user); font-weight: 700; }
-
-    /* Güncellemeler */
-    .update + .update {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-    }
-    .author { font-weight: 600; font-size: .9rem; }
-    .role {
-      display: block;
-      font-size: .7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-    .role.admin { color: var(--admin); }
-    .role.user  { color: var(--user); }
-    .update p { font-size: .85rem; color: #c4c5cb; margin-top: 6px; }
-    .update time { font-size: .72rem; color: var(--muted); }
-
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 640px) {
-      .details-content {
-        grid-template-columns: 1fr;
-        grid-template-areas: "video" "prices" "desc";
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
 
-  <div class="profile">
-    <div class="avatar"><img src="assets/avatar.svg" alt="Profil resmi"></div>
-    <div>
-      <div class="username">Nazgul</div>
-      <span class="role user" lang="en">User</span>
-    </div>
+    <header class="topbar">
+      <div class="profile">
+        <div class="avatar"><img src="assets/avatar.svg" alt="Profil resmi"></div>
+        <div>
+          <div class="username">Nazgul</div>
+          <span class="role user" lang="en">User</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+
+      <section class="panel" aria-label="Oyunlar">
+        <div class="title">Oyunlar</div>
+        <div id="product-list"></div>
+      </section>
+
+      <aside class="panel" aria-label="Güncellemeler">
+        <div class="title">Güncellemeler</div>
+
+        <article class="update">
+          <span class="author">Ömer</span>
+          <span class="role admin" lang="en">Admin</span>
+          <p>Rainbow Six Siege v2.4.1 yayında.</p>
+          <time datetime="2026-10-20">20 Ekim 2026</time>
+        </article>
+
+        <article class="update">
+          <span class="author">Mehmet</span>
+          <span class="role user" lang="en">User</span>
+          <p>FiveM sorunsuz çalışıyor, teşekkürler!</p>
+          <time datetime="2026-10-18">18 Ekim 2026</time>
+        </article>
+
+        <article class="update">
+          <span class="author">Ömer</span>
+          <span class="role admin" lang="en">Admin</span>
+          <p>Squad v3.0.2 güncellemesi yayınlandı.</p>
+          <time datetime="2026-10-15">15 Ekim 2026</time>
+        </article>
+      </aside>
+
+    </main>
   </div>
 
-  <main class="layout">
-
-    <section class="panel" aria-label="Oyunlar">
-      <div class="title">Oyunlar</div>
-
-      <!--
-        Her ürün için:
-        - data-video: YouTube video ID'si (örn. youtube.com/watch?v=XXXX → "XXXX")
-        - fiyatlar ve açıklama aşağıdaki .details içinde
-      -->
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img src="assets/r6.svg" alt="Rainbow Six Siege logosu"></span>
-          <span class="name">Rainbow Six Siege</span>
-          <span class="version">v2.4.1</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺49</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺343</span>₺199</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.470</span>₺549</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                Rainbow Six Siege için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img src="assets/fivem.svg" alt="FiveM logosu"></span>
-          <span class="name">FiveM</span>
-          <span class="version">v1.8.0</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺39</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺273</span>₺159</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.170</span>₺449</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                FiveM için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img class="wide" src="assets/squad.png" alt="Squad logosu"></span>
-          <span class="name">Squad</span>
-          <span class="version">v3.0.2</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺45</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺315</span>₺179</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.350</span>₺499</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                Squad için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img src="assets/warzone.svg" alt="Call of Duty: Warzone logosu"></span>
-          <span class="name">Call of Duty: Warzone</span>
-          <span class="version">v1.2.0</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺55</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺385</span>₺219</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.650</span>₺599</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                Call of Duty: Warzone için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img class="wide" src="assets/arena.png" alt="Arena Breakout: Infinite logosu"></span>
-          <span class="name">Arena Breakout: Infinite</span>
-          <span class="version">v1.0.4</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺45</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺315</span>₺179</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.350</span>₺499</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                Arena Breakout: Infinite için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img src="assets/apex.svg" alt="Apex Legends logosu"></span>
-          <span class="name">Apex Legends</span>
-          <span class="version">v2.1.3</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺55</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺385</span>₺219</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.650</span>₺599</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                Apex Legends için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product" data-video="">
-        <div class="row">
-          <span class="logo"><img class="wide" src="assets/metin2.png" alt="Metin2 logosu"></span>
-          <span class="name">Metin2</span>
-          <span class="version">v1.0.0</span>
-          <button class="btn toggle" aria-expanded="false">Purchase</button>
-        </div>
-        <div class="details">
-          <div class="details-inner">
-            <div class="details-content">
-              <div class="video"></div>
-              <div class="prices">
-                <button class="plan"><span class="label">1 Gün</span><span class="price">₺35</span></button>
-                <button class="plan popular"><span class="label"><span class="tag">En popüler</span>1 Hafta</span><span class="price"><span class="old">₺245</span>₺139</span></button>
-                <button class="plan"><span class="label">1 Ay</span><span class="price"><span class="old">₺1.050</span>₺379</span></button>
-                <div class="note">Ödeme sonrası anında teslim</div>
-              </div>
-              <div class="desc">
-                Metin2 için hazırlanan paket. Kurulumu birkaç dakika sürer.
-                <ul>
-                  <li>Kolay kurulum</li>
-                  <li>Düzenli güncelleme</li>
-                  <li>7/24 destek</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <aside class="panel" aria-label="Güncellemeler">
-      <div class="title">Güncellemeler</div>
-
-      <article class="update">
-        <span class="author">Ömer</span>
-        <span class="role admin" lang="en">Admin</span>
-        <p>Rainbow Six Siege v2.4.1 yayında.</p>
-        <time datetime="2026-10-20">20 Ekim 2026</time>
-      </article>
-
-      <article class="update">
-        <span class="author">Mehmet</span>
-        <span class="role user" lang="en">User</span>
-        <p>FiveM sorunsuz çalışıyor, teşekkürler!</p>
-        <time datetime="2026-10-18">18 Ekim 2026</time>
-      </article>
-
-      <article class="update">
-        <span class="author">Ömer</span>
-        <span class="role admin" lang="en">Admin</span>
-        <p>Squad v3.0.2 güncellemesi yayınlandı.</p>
-        <time datetime="2026-10-15">15 Ekim 2026</time>
-      </article>
-    </aside>
-
-  </main>
-
+  <script src="products.js"></script>
   <script>
-    const products = document.querySelectorAll('.product');
-
-    function close(p) {
-      p.classList.remove('open');
-      const btn = p.querySelector('.toggle');
-      btn.textContent = 'Purchase';
-      btn.setAttribute('aria-expanded', 'false');
-      // Kapanınca videoyu durdurmak için iframe'i kaldır
-      setTimeout(() => { if (!p.classList.contains('open')) p.querySelector('.video').innerHTML = ''; }, 300);
-    }
-
-    function open(p) {
-      p.classList.add('open');
-      const btn = p.querySelector('.toggle');
-      btn.textContent = 'Kapat';
-      btn.setAttribute('aria-expanded', 'true');
-
-      const box = p.querySelector('.video');
-      const id = p.dataset.video;
-      box.innerHTML = id
-        ? `<iframe src="https://www.youtube-nocookie.com/embed/${id}" title="Ürün videosu" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
-        : '<div class="empty">Video yakında</div>';
-    }
-
-    products.forEach(p => {
-      p.querySelector('.toggle').addEventListener('click', () => {
-        const isOpen = p.classList.contains('open');
-        products.forEach(o => o.classList.contains('open') && close(o)); // aynı anda tek ürün açık
-        if (!isOpen) open(p);
-      });
-    });
+    document.getElementById('product-list').innerHTML = PRODUCTS.map(p => `
+      <div class="product">
+        ${logoHTML(p)}
+        <span class="name">${p.name}</span>
+        <span class="version">${p.version}</span>
+        <a class="btn" href="product.html?id=${p.id}">Purchase</a>
+      </div>`).join('');
   </script>
-
 </body>
 </html>

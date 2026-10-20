@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ürün</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+    <header class="topbar">
+      <div class="profile">
+        <div class="avatar"><img src="assets/avatar.svg" alt="Profil resmi"></div>
+        <div>
+          <div class="username">Nazgul</div>
+          <span class="role user" lang="en">User</span>
+        </div>
+      </div>
+      <a class="back" href="index.html">← Tüm oyunlar</a>
+    </header>
+
+    <main id="page"></main>
+  </div>
+
+  <script src="products.js"></script>
+  <script>
+    const id = new URLSearchParams(location.search).get('id');
+    const p = PRODUCTS.find(x => x.id === id);
+    const page = document.getElementById('page');
+
+    if (!p) {
+      page.innerHTML = `
+        <div class="panel" style="text-align:center">
+          <p style="margin-bottom:14px">Ürün bulunamadı.</p>
+          <a class="btn" href="index.html">Oyunlara dön</a>
+        </div>`;
+    } else {
+      document.title = p.name;
+
+      const video = p.video
+        ? `<iframe src="https://www.youtube-nocookie.com/embed/${p.video}" title="${p.name} videosu" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+        : '<div class="empty">Video yakında</div>';
+
+      const plans = p.plans.map((pl, i) => `
+        <button class="plan${pl.popular ? ' selected' : ''}" data-i="${i}" aria-pressed="${!!pl.popular}">
+          <span class="label">${pl.popular ? '<span class="tag">En popüler</span>' : ''}${pl.label}</span>
+          <span class="price">${pl.old ? `<span class="old">${pl.old}</span>` : ''}${pl.price}</span>
+        </button>`).join('');
+
+      page.innerHTML = `
+        <div class="hero">
+          <span class="logo"><img${p.wide ? ' class="wide"' : ''} src="assets/${p.logo}" alt="${p.name} logosu"></span>
+          <div>
+            <h1>${p.name}</h1>
+            <span class="status"><span class="dot"></span>Aktif · ${p.version}</span>
+          </div>
+        </div>
+
+        <div class="detail">
+          <div class="video">${video}</div>
+
+          <div class="panel prices">
+            <div class="title">Fiyatlar</div>
+            <div class="plans">${plans}</div>
+            <button class="btn buy" id="buy"></button>
+            <div class="note">Ödeme sonrası anında teslim</div>
+          </div>
+
+          <div class="panel desc">
+            <div class="title">Açıklama</div>
+            <p>${p.description}</p>
+            <ul>${p.features.map(f => `<li>${f}</li>`).join('')}</ul>
+          </div>
+        </div>`;
+
+      // Plan seçimi: seçilen plan satın al butonunda görünür
+      const buy = document.getElementById('buy');
+      const buttons = page.querySelectorAll('.plan');
+      function select(i) {
+        buttons.forEach(b => {
+          const on = +b.dataset.i === i;
+          b.classList.toggle('selected', on);
+          b.setAttribute('aria-pressed', on);
+        });
+        const pl = p.plans[i];
+        buy.textContent = `Satın al · ${pl.label} · ${pl.price}`;
+        buy.dataset.plan = pl.label;
+      }
+      buttons.forEach(b => b.addEventListener('click', () => select(+b.dataset.i)));
+      select(Math.max(0, p.plans.findIndex(pl => pl.popular)));
+
+      // Ödeme sistemi hazır olunca burası ödeme sayfasına yönlendirecek
+      buy.addEventListener('click', () => {
+        alert(`${p.name} – ${buy.dataset.plan} seçildi. Ödeme sayfası henüz bağlanmadı.`);
+      });
+    }
+  </script>
+</body>
+</html>
