@@ -70,6 +70,14 @@
       gap: 14px;
       padding: 14px 16px;
     }
+    .logo {
+      width: 40px; height: 40px;
+      border-radius: 9px;
+      background: #2e2f34;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .logo img { width: 26px; height: 26px; display: block; }
     .name { flex: 1; font-weight: 600; }
     .version {
       font-family: ui-monospace, Consolas, monospace;
@@ -228,6 +236,7 @@
 
       <div class="product" data-video="">
         <div class="row">
+          <span class="logo"><img src="assets/r6.svg" alt="Rainbow Six Siege logosu"></span>
           <span class="name">Rainbow Six Siege</span>
           <span class="version">v2.4.1</span>
           <button class="btn toggle" aria-expanded="false">Purchase</button>
@@ -257,6 +266,7 @@
 
       <div class="product" data-video="">
         <div class="row">
+          <span class="logo"><img src="assets/fivem.svg" alt="FiveM logosu"></span>
           <span class="name">FiveM</span>
           <span class="version">v1.8.0</span>
           <button class="btn toggle" aria-expanded="false">Purchase</button>
@@ -286,6 +296,7 @@
 
       <div class="product" data-video="">
         <div class="row">
+          <span class="logo"><img src="assets/squad.svg" alt="Squad logosu"></span>
           <span class="name">Squad</span>
           <span class="version">v3.0.2</span>
           <button class="btn toggle" aria-expanded="false">Purchase</button>
