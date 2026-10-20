@@ -26,8 +26,27 @@
       font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
       line-height: 1.5;
       min-height: 100vh;
-      padding: 56px 16px;
+      padding: 24px 16px 56px;
     }
+
+    /* Profil (sol üst) */
+    .profile {
+      max-width: 1120px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .profile .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: #0b0b0d;
+      border: 1px solid var(--line);
+      display: grid; place-items: center;
+      overflow: hidden;
+    }
+    .profile .avatar img { width: 34px; height: 34px; display: block; }
+    .profile .username { font-weight: 600; line-height: 1.2; }
 
     .layout {
       max-width: 1120px;
@@ -223,6 +242,14 @@
   </style>
 </head>
 <body>
+
+  <div class="profile">
+    <div class="avatar"><img src="assets/avatar.svg" alt="Profil resmi"></div>
+    <div>
+      <div class="username">Nazgul</div>
+      <span class="role user" lang="en">User</span>
+    </div>
+  </div>
 
   <main class="layout">
 
