@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ürünler</title>
+  <style>
+    :root {
+      --bg: #141416;            /* siyaha yakın gri */
+      --panel: #26272b;         /* ortadaki gri kutu */
+      --row: #2f3035;
+      --row-hover: #383a40;
+      --border: #3c3e44;
+      --text: #ececee;
+      --muted: #9a9ca3;
+      --accent: #4f8cff;        /* güven veren mavi: satın al */
+      --accent-hover: #3b78ee;
+      --admin: #a855f7;         /* mor */
+      --user: #22c55e;          /* yeşil */
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px;
+      line-height: 1.5;
+    }
+
+    /* Başlık: kısa ve net mesaj, ilk bakışta ne olduğunu anlatır */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Ana düzen: ortada ürünler, sağda güncellemeler */
+    .layout {
+      width: 100%;
+      max-width: 1180px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .panel h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Ürün satırları (yatay) */
+    .products { display: flex; flex-direction: column; gap: 12px; }
+
+    .product {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--row);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+    .product:hover {
+      background: var(--row-hover);
+      border-color: var(--border);
+      transform: translateY(-2px);
+    }
+
+    .icon {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-weight: 800; font-size: 1rem;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .icon.r6    { background: linear-gradient(135deg, #3a3d46, #5b5f6b); }
+    .icon.fivem { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .icon.squad { background: linear-gradient(135deg, #65713e, #8a9a52); }
+
+    .info { flex: 1; min-width: 0; }
+    .info .name { font-weight: 600; font-size: 1.05rem; }
+    .info .status {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .82rem; color: var(--muted); margin-top: 2px;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--user);
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, .55); }
+      70%  { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .version {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: .85rem;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .purchase {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-weight: 600;
+      font-size: .95rem;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(79, 140, 255, .3);
+    }
+    .purchase:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 20px rgba(79, 140, 255, .45);
+    }
+    .purchase:active { transform: scale(.97); }
+    .purchase:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    /* Güven unsurları */
+    .trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .trust span { display: inline-flex; align-items: center; gap: 6px; }
+
+    /* Güncellemeler */
+    .updates { display: flex; flex-direction: column; gap: 12px; }
+
+    .update {
+      background: var(--row);
+      border-radius: 12px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--border);
+    }
+    .update.by-admin { border-left-color: var(--admin); }
+    .update.by-user  { border-left-color: var(--user); }
+
+    .update .head {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-weight: 700; font-size: .9rem;
+      background: #44464d; color: #fff;
+      flex-shrink: 0;
+    }
+    .author { font-weight: 600; font-size: .95rem; }
+    .role {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 1px 8px;
+      border-radius: 999px;
+      margin-top: 1px;
+    }
+    .role.admin { color: var(--admin); background: rgba(168, 85, 247, .14); }
+    .role.user  { color: var(--user);  background: rgba(34, 197, 94, .14); }
+
+    .update p {
+      margin-top: 10px;
+      font-size: .88rem;
+      color: #c9cad0;
+    }
+    .update time {
+      display: block;
+      margin-top: 6px;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    /* Mobil */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .product { flex-wrap: wrap; }
+      .info { flex-basis: calc(100% - 64px); }
+      .version { margin-left: 64px; }
+      .purchase { margin-left: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Ürünlerimiz</h1>
+    <p>Hemen satın al, saniyeler içinde kullanmaya başla.</p>
+  </header>
+
+  <main class="layout">
+
+    <!-- Ortadaki gri kutu: oyunlar -->
+    <section class="panel" aria-labelledby="products-title">
+      <h2 id="products-title">🎮 Oyunlar</h2>
+
+      <div class="products">
+        <div class="product">
+          <div class="icon r6">R6</div>
+          <div class="info">
+            <div class="name">Rainbow Six Siege</div>
+            <div class="status"><span class="dot"></span>Aktif · Güncel</div>
+          </div>
+          <span class="version">v2.4.1</span>
+          <a href="#" class="purchase">Purchase</a>
+        </div>
+
+        <div class="product">
+          <div class="icon fivem">FM</div>
+          <div class="info">
+            <div class="name">FiveM</div>
+            <div class="status"><span class="dot"></span>Aktif · Güncel</div>
+          </div>
+          <span class="version">v1.8.0</span>
+          <a href="#" class="purchase">Purchase</a>
+        </div>
+
+        <div class="product">
+          <div class="icon squad">SQ</div>
+          <div class="info">
+            <div class="name">Squad</div>
+            <div class="status"><span class="dot"></span>Aktif · Güncel</div>
+          </div>
+          <span class="version">v3.0.2</span>
+          <a href="#" class="purchase">Purchase</a>
+        </div>
+      </div>
+
+      <div class="trust">
+        <span>⚡ Anında teslimat</span>
+        <span>🔒 Güvenli ödeme</span>
+        <span>💬 7/24 destek</span>
+      </div>
+    </section>
+
+    <!-- Sağdaki ayrı kutu: güncellemeler -->
+    <aside class="panel" aria-labelledby="updates-title">
+      <h2 id="updates-title">📢 Güncellemeler</h2>
+
+      <div class="updates">
+        <article class="update by-admin">
+          <div class="head">
+            <div class="avatar">Ö</div>
+            <div>
+              <div class="author">Ömer</div>
+              <span class="role admin">Admin</span>
+            </div>
+          </div>
+          <p>Rainbow Six Siege v2.4.1 yayında. Performans iyileştirmeleri yapıldı.</p>
+          <time datetime="2026-10-20">20 Ekim 2026</time>
+        </article>
+
+        <article class="update by-user">
+          <div class="head">
+            <div class="avatar">M</div>
+            <div>
+              <div class="author">Mehmet</div>
+              <span class="role user">User</span>
+            </div>
+          </div>
+          <p>FiveM sürümü sorunsuz çalışıyor, teşekkürler!</p>
+          <time datetime="2026-10-18">18 Ekim 2026</time>
+        </article>
+
+        <article class="update by-admin">
+          <div class="head">
+            <div class="avatar">Ö</div>
+            <div>
+              <div class="author">Ömer</div>
+              <span class="role admin">Admin</span>
+            </div>
+          </div>
+          <p>Squad v3.0.2 güncellemesi yayınlandı. Yeni özellikler eklendi.</p>
+          <time datetime="2026-10-15">15 Ekim 2026</time>
+        </article>
+      </div>
+    </aside>
+
+  </main>
+
+  <footer>© 2026 · Tüm hakları saklıdır.</footer>
+
+</body>
+</html>
